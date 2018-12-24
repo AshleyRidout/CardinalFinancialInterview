@@ -9,6 +9,7 @@ package nailedItToolRental;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Date;
 import java.util.Locale;
 
 public class ToolRentalAgreement {
@@ -24,17 +25,8 @@ public class ToolRentalAgreement {
 	protected String formattedDiscountAmount;
 	protected String formattedTotalAfterDiscount;
 	
-	// constructor
-	protected ToolRentalAgreement(Tool rentedTool, String checkoutDate, 
-			int rentalDays, int discount) {
-	this.rentedTool = rentedTool;
-	this.checkoutDate = checkoutDate;
-	this.rentalDays = rentalDays;
-	this.discount = discount;
-	
-	}
 	/*
-	 * Generate rental agreement to display to customer on console
+	 * Constructor to generate rental agreement to display to customer on console
 	 * 
 	 * @param rentedTool				the Tool being rented
 	 * @param checkoutDate				the Date formatted from the String user input
@@ -43,27 +35,41 @@ public class ToolRentalAgreement {
 	 * @param toolRentalFeatures		the ToolRentalFeatures with attributes of the Tool object
 	 * @param decimalPercentDiscount	the double discount percentage as a decimal
 	 */
-	protected void generateRentalAgreement(Tool rentedTool, String checkoutDate, int rentalDays, 
-			String dueDate, int chargeDays, ToolRentalFeatures toolRentalFeatures, double decimalPercentDiscount) {
+	protected ToolRentalAgreement(Tool rentedTool, String checkoutDate, int rentalDays, 
+			String dueDate, int chargeDays, ToolRentalFeatures toolRentalFeatures, 
+			double totalBeforeDiscount, double inputDiscount, int percentDiscount) {
+		
+		this.checkoutDate = checkoutDate;
+		this.dueDate = dueDate;
+		this.chargeDays = chargeDays;
+		this.rentalDays = rentalDays;
 		
 		// format Strings that will be displayed on the console 
 		double dailyCharge = rentedTool.getDailyCharge();
+		
 		formattedDailyCharge = NumberFormat.getCurrencyInstance(new Locale("en", "US"))
 		       .format(dailyCharge);
 		
+		double beforeDiscount = toolRentalFeatures.totalChargeBeforeDiscount(rentedTool, chargeDays);
 		formattedTotalBeforeDiscount = NumberFormat
 				.getCurrencyInstance(new Locale("en", "US"))
-				.format(toolRentalFeatures.totalBeforeDiscount);
+				.format(beforeDiscount);
 		
+		double decimalPercentDiscount = percentDiscount * .01;
 		formattedDiscountPercent = new DecimalFormat("##%").format(decimalPercentDiscount);
 		
+		double discountAmount = toolRentalFeatures.getDiscountAmount(totalBeforeDiscount, percentDiscount);
+		// round up to nearest cent
+		double roundTo = .01;
+		discountAmount = roundTo * Math.round(discountAmount / roundTo);
 		formattedDiscountAmount = NumberFormat
 				.getCurrencyInstance(new Locale("en", "US"))
-				.format(toolRentalFeatures.discountAmount);
+				.format(discountAmount);
 		
+		double totalAfterDiscount = toolRentalFeatures.totalChargeAfterDiscount(totalBeforeDiscount, discountAmount);
 		formattedTotalAfterDiscount = NumberFormat
 				.getCurrencyInstance(new Locale("en", "US"))
-				.format(toolRentalFeatures.totalAfterDiscount);
+				.format(totalAfterDiscount);
 		
 		// print each line item to console
 		System.out.println("\nTool code:\t\t" + rentedTool.formattedToolCode);
