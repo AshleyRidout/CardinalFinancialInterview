@@ -1,0 +1,322 @@
+/*
+ * Methods to expand the features of the Tool object
+ * Features include: Establishing rental dates and charge dates
+ * 					 Defining weekends and holidays that affect charge dates
+ * 					 Changing total charge based on discount
+ * 					 Exceptions for illegal arguments based on business logic
+ * 
+ * @author Ashley Ridout
+ * @version 1.0.0.0
+ * @since 2018-12-16
+ */
+package nailedItToolRental;
+
+import java.text.ParseException;
+
+import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
+import java.time.LocalDate;
+import java.time.Month;
+import java.time.ZoneId;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+public class ToolRentalFeatures {
+	protected int chargeDays;
+	protected double totalBeforeDiscount;
+	protected double dailyCharge;
+	protected double decimalPercentDiscount;
+	protected double discountAmount;
+	protected double totalAfterDiscount;
+	
+	// empty constructor
+	protected ToolRentalFeatures(){}
+	
+	/******************* Methods to define rental dates and charge dates *******************/
+	
+	/*
+	 * Convert user String input to Date format
+	 * 
+	 * @param userCheckoutDate	the String date when the user checks out the tool
+	 * @return checkoutDate		the Date formatted from the String user input
+	 * @throws ParseException	if the date format is not MM/dd/yy
+	 */
+	protected Date formatCheckoutDate(String userCheckoutDate) 
+			throws ParseException {
+			SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy");
+			Date checkoutDate = dateFormat.parse(userCheckoutDate);
+
+			return checkoutDate;
+	}
+
+	/*
+	 * Set due date based on checkout date and number of rental days
+	 * 
+	 * @param checkoutDate	the Date when the user checks out the tool
+	 * @param rentalDays	the int for the number of days the tool is rented
+	 * @return dueDate		the Date when the user is required to return the tool
+	 */
+	protected Date setDueDate(Date checkoutDate, int rentalDays) {
+		//validate user input for number of rental days
+		validateNumberOfRentalDays(rentalDays);
+		
+		//get due date based on checkout date and number of rental days
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(checkoutDate);
+		cal.add(Calendar.DATE, rentalDays);
+		Date dueDate = cal.getTime();
+
+		return dueDate;
+	}
+
+
+	/*
+	 * Get all the dates from checkout date through due date
+	 * 
+	 * @param checkoutDate		the Date the tool is checked out
+	 * @param rentalDays		the int for number of days the tool is rented				
+	 * @return allRentalDates	the List<LocalDate> for the day after checkout
+	 * 							through the dueDate
+	 */
+	protected List<LocalDate> getDatesDuringRental(Date checkoutDate, int rentalDays) {
+		LocalDate localCheckoutDate = convertToLocalDate(checkoutDate);
+
+		List<LocalDate> allRentalDates = IntStream.iterate(1, i -> i + 1)
+				.limit(rentalDays).mapToObj(localCheckoutDate::plusDays)
+				.collect(Collectors.toList());
+		
+		return allRentalDates;
+	}
+	
+	/*
+	 * Convert Date to LocalDate for getDatesDuringRental() method
+	 * 
+	 * @param dateToConvert	the Date to convert to LocalDate
+	 * @return localDate	the LocalDate that was converted from Date
+	 */
+	private static LocalDate convertToLocalDate(Date dateToConvert) {
+		LocalDate localDate = dateToConvert.toInstant()
+				.atZone(ZoneId.systemDefault())
+				.toLocalDate();
+		return localDate;
+	}
+
+	/*
+	 * Convert Date  to String
+	 * 
+	 * @param dateToConvert	the Date to be converted String
+	 * @return stringDate	the String that was converted
+	 */
+	protected String convertDateToString(Date dateToConvert) {
+	String stringDate;
+	SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy");
+	stringDate = dateFormat.format(dateToConvert);
+	
+	return stringDate;
+	}
+	
+	/*
+	 * Get the count of days there is a charge for the tool 
+	 * Some tools are free on weekends and holidays
+	 * 
+	 * @param rentedTool	the Tool being rented
+	 * @param bookDates		the List<LocalDate> when the tool is checked out
+	 * @param rentalDays	the int count of days the tool is being rented
+	 * @return chargeDays	the int count of days there is a fee for the rented tool
+	 */
+	protected int getChargeDays(Tool rentedTool, List<LocalDate> bookDates, 
+			int rentalDays) {
+
+		int holidayDays = 0;
+		int weekendDays = 0;
+
+		if (true == rentedTool.isRentedOnHoliday()) {
+			if (isObservedJuly4th(bookDates)) {
+				holidayDays++;
+			}
+
+			if (isLaborDay(bookDates)) {
+				holidayDays++;
+			}
+		}
+
+		if (true == rentedTool.isRentedOnWeekend()) {
+			weekendDays = weekendDuringRental(bookDates);
+		}
+		chargeDays = rentalDays - holidayDays - weekendDays;
+		
+		return chargeDays;
+	}
+
+	/*********** Methods to define weekends and holidays that affect charge dates **********/
+	
+	/*
+	 * Get total weekend dates between checkout date and due date
+	 * 
+	 * @param bookDates		the List<LocalDate> when the tool is checked out
+	 * @return weekendDays	the int count of dates that the tool is rented on a weekend
+	 */
+	protected int weekendDuringRental(List<LocalDate> bookDates) {
+		int weekendDays = 0;
+		for (LocalDate date : bookDates) {
+			if (date.getDayOfWeek() == DayOfWeek.SATURDAY 
+					|| date.getDayOfWeek() == DayOfWeek.SUNDAY) {
+				weekendDays++;
+			}
+		}
+		return weekendDays;
+	}
+
+	/*
+	 * Get the date that July 4th is observed for the specific year
+	 * If Saturday, July 4th is observed on the previous Friday
+	 * If Sunday, July 4th is observed on the following Monday
+	 * 
+	 * @param bookDates			the List<LocalDate> when the tool is checked out
+	 * @return isObservedJuly4	boolean true if date is on observed July 4
+	 */
+	public static boolean isObservedJuly4th(List<LocalDate> bookDates) {
+		boolean isObservedJuly4 = false;
+
+		for (LocalDate date : bookDates) {
+			// Get the observed holiday date of July 4th
+			if (date.getMonth() == Month.JULY && date.getDayOfMonth() == 4) {
+
+				DayOfWeek day = date.getDayOfWeek();
+				switch (day) {
+				case SATURDAY:
+					date = date.minusDays(1);
+					System.out.print(date);
+					return isObservedJuly4 = true;
+				case SUNDAY:
+					date = date.plusDays(1);
+					System.out.print(date);
+					return isObservedJuly4 = true;
+				default:
+					return isObservedJuly4 = true;
+				}
+
+			} else
+				isObservedJuly4 = false;
+		}
+		return isObservedJuly4;
+	}
+
+	/*
+	 * Get the date for Labor Day of the specific year
+	 * 
+	 * @param bookDates		the List<LocalDate> when the tool is checked out
+	 * @return isLaborDay	boolean true if date is Labor Day
+	 */
+	public static boolean isLaborDay(List<LocalDate> bookDates) {
+
+		boolean isLaborDay = false;
+		for (LocalDate localDate : bookDates) {
+			Date date = convertToDate(localDate);
+			Calendar cal = Calendar.getInstance();
+			cal.setTime(date);
+			if (cal.get(Calendar.MONTH) == Calendar.SEPTEMBER 
+					&& cal.get(Calendar.DAY_OF_WEEK) == Calendar.MONDAY
+					&& cal.get(Calendar.DAY_OF_WEEK_IN_MONTH) == 1) {
+				isLaborDay = true;
+			}
+		}
+		return isLaborDay;
+	}
+	
+	/*
+	 * Convert LocalDate to Date for isLaborDay() method
+	 * 
+	 * @param dateToConvert	the LocalDate to convert to Date
+	 * @return date			the Date that was converted from LocalDate
+	 */
+	private static Date convertToDate(LocalDate dateToConvert) {
+		Date date = java.sql.Date.valueOf(dateToConvert);
+		return date;
+	}
+
+	/******************* Methods to change total charge based on discount ******************/
+	
+	/*
+	 * Get the total amount the customer owes before any applicable discount
+	 * 
+	 * @param rentedTool			the Tool object based on the tool code
+	 * @param chargeDays			the int count of days there is a fee for the tool
+	 * @return totalBeforeDiscount	the double total owed by the customer before discount
+	 */
+	protected double totalChargeBeforeDiscount(Tool rentedTool, int chargeDays) {
+		
+		dailyCharge = rentedTool.getDailyCharge();
+		
+		totalBeforeDiscount = dailyCharge * chargeDays;
+		
+		return totalBeforeDiscount;
+	}
+	
+	/*
+	 * Get the discount amount that will be deducted from the subtotal
+	 * 
+	 * @param totalBeforeDiscount	the double total owed by the customer before discount
+	 * @param percentDiscount		the int discount applied to the rented tool
+	 * @return discountAmount		the double amount that will be deducted from the subtotal
+	 */
+	protected double getDiscountAmount(double totalBeforeDiscount, int percentDiscount) {
+		// validate user input for discount percent entered
+		validateDiscountPercent(percentDiscount);
+		
+		//change whole number to decimal percentage
+		decimalPercentDiscount = percentDiscount * 0.01;
+		discountAmount = (totalBeforeDiscount * decimalPercentDiscount);
+		
+		return discountAmount;
+	}
+	
+	/*
+	 * Get the total amount the customer owes after any applicable discount
+	 * 
+	 * @param totalBeforeDiscount	the double total owed by the customer before discount
+	 * @param percentDiscount		the int discount applied to the rented tool
+	 * @return totalAfterDiscount	the double total owed by the customer after discount
+	 */
+	protected double totalChargeAfterDiscount(double totalBeforeDiscount, 
+			double discountAmount) {
+		
+		totalAfterDiscount = totalBeforeDiscount - discountAmount;
+		
+		return totalAfterDiscount;
+	}
+
+	/*************** Exceptions for illegal arguments based on business logic **************/
+	
+	/*
+	 * Validate user input for number of rental days
+	 * 
+	 * @param rentalDays				the int count of days the tool is being rented
+	 * @throws IllegalArgumentException	if values < 1
+	 */
+	protected void validateNumberOfRentalDays(int rentalDays) 
+			throws IllegalArgumentException {
+		if (rentalDays < 1) {
+			throw new IllegalArgumentException("Tool must be rented for at least 1 day."
+					+ " Please enter the number of days you would like to rent the tool.");
+		}
+	}
+
+	/*
+	 * Validate user input for the percent discount
+	 * 
+	 * @param percentDiscount			the int discount applied to the rented tool
+	 * @throws IllegalArgumentException	if values < 0 && values > 100
+	 */
+	protected void validateDiscountPercent(int percentDiscount) 
+			throws IllegalArgumentException {
+		if (percentDiscount < 0 || percentDiscount > 100) {
+			throw new IllegalArgumentException(
+					"Discount percent must be between 0 and 100." 
+							+ " Please enter the discount percent for the tool.");
+		}
+	}
+}
