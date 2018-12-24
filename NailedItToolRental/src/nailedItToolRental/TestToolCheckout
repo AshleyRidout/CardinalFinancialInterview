@@ -1,0 +1,307 @@
+/* 
+ * JUnit Test for Nailed It Tool Rental
+ * 
+ * @author Ashley Ridout
+ * @version 1.0.0.0
+ * @since 2018-12-23
+ */
+
+package nailedItToolRental;
+
+import org.junit.Test;
+import static org.junit.Assert.*;
+
+public class TestToolCheckout {
+	   
+	    String[] toolCode = {"JAKR","LADW","CHNS","JAKD","JAKR","JAKR"};
+	    String[] stringCheckoutDate = {"9/3/15","7/2/20","7/2/15","9/3/15","7/2/15","7/2/20"};
+	    int[] numberOfRentalDays = {5,3,5,6,9,4};
+	    int[] percentDiscount = {101,10,25,0,0,50};
+	    
+	    String[] stringDueDate = {"","7/5/20","7/7/15","9/9/15","7/11/15", "7/6/20"};
+	    String[] outputDailyCharge = {"$0.00","$1.99","$1.49","$2.99","$2.99","$2.99"};
+	    int[] chargeDays = {0,2,3,3,5,1};
+	    double[] inputTotalBeforeDiscount = {0,3.98,4.47,8.97,14.95,2.99};
+	    String[] formattedTotalBeforeDiscount = {"$0.00","$3.98","$4.47","$8.97","$14.95","$2.99"};
+	    String[] outputPercentDiscount = {"0.00%","10%","25%","0%","0%","50%"};
+	    double[] inputDiscountAmount = {0.00,0.40,1.12,0.00,0.00,1.50};
+	    String[] formattedDiscountAmount = {"$0.00","$0.40","$1.12","$0.00","$0.00","$1.50"};
+	    String[] formattedTotalAfterDiscount = {"$0.00", "$3.58","$3.35","$8.97","$14.95","$1.49",""};
+	    
+	    /**
+	     * Test of setRentalDetails method, of class RentalDetails.
+	     */
+	    @Test(expected = IllegalArgumentException.class)
+	    public void Test1() throws Exception {
+	        System.out.println("Test 1");
+	        String code = toolCode[0];
+	        Tool rentedTool = new Tool(code);
+	        
+	        int rentalDays = numberOfRentalDays[0];
+	        String checkoutDate = stringCheckoutDate[0];
+	        String dueDate = stringDueDate[0];
+	        int NumberOfChargeDays = chargeDays[0];
+	        double inputTotalBefore = inputTotalBeforeDiscount[0]; 
+	        double inputDiscount = inputDiscountAmount[0];
+	        int discount = percentDiscount[0];
+	        
+	        ToolRentalFeatures toolRentalFeatures = new ToolRentalFeatures();
+	        
+	        ToolRentalAgreement toolRentalAgreement = new ToolRentalAgreement
+	        			(rentedTool, checkoutDate, 
+						rentalDays, dueDate, NumberOfChargeDays,
+						toolRentalFeatures, inputTotalBefore, inputDiscount, discount);
+	        
+	        ToolRentalAgreement expResult = null;
+	        
+	        String getToolCode =  rentedTool.toolCode;
+	        int getRentalDays = toolRentalAgreement.rentalDays;
+	        String getCheckoutDate = toolRentalAgreement.checkoutDate;
+	        String getDueDate = toolRentalAgreement.dueDate;
+	        String getDailyCharge = toolRentalAgreement.formattedDailyCharge;
+	        int getChargeDays = toolRentalAgreement.chargeDays;
+	        String getChargeBeforeDiscount = toolRentalAgreement.formattedTotalBeforeDiscount;
+	        String getOutputDiscount = toolRentalAgreement.formattedDiscountPercent;
+	        String getDiscountAmount = toolRentalAgreement.formattedDiscountAmount;
+	        String getChargeAfterDiscount = toolRentalAgreement.formattedTotalAfterDiscount;
+
+	        assertEquals(getToolCode, toolCode[0]);
+	        assertEquals(getRentalDays, numberOfRentalDays[0]);
+	        assertEquals(getCheckoutDate, stringCheckoutDate[0]);
+	        assertEquals(getDueDate, stringDueDate[0]);
+	        assertEquals(getDailyCharge, outputDailyCharge[0]);
+	        assertEquals(getChargeDays, chargeDays[0]);
+	        assertEquals(getChargeBeforeDiscount, formattedTotalBeforeDiscount[0]);
+	        assertEquals(getOutputDiscount, outputPercentDiscount[0]);
+	        assertEquals(getDiscountAmount, formattedDiscountAmount[0]);
+	        assertEquals(getChargeAfterDiscount, formattedTotalAfterDiscount[0]);
+	    }
+	      
+	    @Test
+	    public void Test2() {
+	        System.out.println("Test 2");
+	        String code = toolCode[1];
+	        Tool rentedTool = new Tool(code);
+	        
+	        int rentalDays = numberOfRentalDays[1];
+	        String checkoutDate = stringCheckoutDate[1];
+	        String dueDate = stringDueDate[1];
+	        int NumberOfChargeDays = chargeDays[1];
+	        double inputTotalBefore = inputTotalBeforeDiscount[1]; 
+	        double inputDiscount = inputDiscountAmount[1];
+	        int discount = percentDiscount[1];
+	        
+	        ToolRentalFeatures toolRentalFeatures = new ToolRentalFeatures();
+	        
+	        ToolRentalAgreement toolRentalAgreement = new ToolRentalAgreement
+	        			(rentedTool, checkoutDate, 
+						rentalDays, dueDate, NumberOfChargeDays,
+						toolRentalFeatures, inputTotalBefore, inputDiscount, discount);
+	        
+	        ToolRentalAgreement expResult = null;
+	        String getToolCode =  rentedTool.toolCode;
+	        int getRentalDays = toolRentalAgreement.rentalDays;
+	        String getCheckoutDate = toolRentalAgreement.checkoutDate;
+	        String getDueDate = toolRentalAgreement.dueDate;
+	        String getDailyCharge = toolRentalAgreement.formattedDailyCharge;
+	        int getChargeDays = toolRentalAgreement.chargeDays;
+	        String getChargeBeforeDiscount = toolRentalAgreement.formattedTotalBeforeDiscount;
+	        String getOutputDiscount = toolRentalAgreement.formattedDiscountPercent;
+	        String getDiscountAmount = toolRentalAgreement.formattedDiscountAmount;
+	        String getChargeAfterDiscount = toolRentalAgreement.formattedTotalAfterDiscount;
+
+	        assertEquals(getToolCode, toolCode[1]);
+	        assertEquals(getRentalDays, numberOfRentalDays[1]);
+	        assertEquals(getCheckoutDate, stringCheckoutDate[1]);
+	        assertEquals(getDueDate, stringDueDate[1]);
+	        assertEquals(getDailyCharge, outputDailyCharge[1]);
+	        assertEquals(getChargeDays, chargeDays[1]);
+	        assertEquals(getChargeBeforeDiscount, formattedTotalBeforeDiscount[1]);
+	        assertEquals(getOutputDiscount, outputPercentDiscount[1]);
+	        assertEquals(getDiscountAmount, formattedDiscountAmount[1]);
+	        assertEquals(getChargeAfterDiscount, formattedTotalAfterDiscount[1]); 
+	    }
+	    
+	    @Test
+	    public void Test3() {
+	        System.out.println("Test 3");
+	        String code = toolCode[2];
+	        Tool rentedTool = new Tool(code);
+	        
+	        int rentalDays = numberOfRentalDays[2];
+	        String checkoutDate = stringCheckoutDate[2];
+	        String dueDate = stringDueDate[2];
+	        int NumberOfChargeDays = chargeDays[2];
+	        double inputTotalBefore = inputTotalBeforeDiscount[2]; 
+	        double inputDiscount = inputDiscountAmount[2];
+	        int discount = percentDiscount[2];
+	        
+	        ToolRentalFeatures toolRentalFeatures = new ToolRentalFeatures();
+	        
+	        ToolRentalAgreement toolRentalAgreement = new ToolRentalAgreement
+	        			(rentedTool, checkoutDate, 
+						rentalDays, dueDate, NumberOfChargeDays,
+						toolRentalFeatures, inputTotalBefore, inputDiscount, discount);
+	        
+	        ToolRentalAgreement expResult = null;
+	        String getToolCode =  rentedTool.toolCode;
+	        int getRentalDays = toolRentalAgreement.rentalDays;
+	        String getCheckoutDate = toolRentalAgreement.checkoutDate;
+	        String getDueDate = toolRentalAgreement.dueDate;
+	        String getDailyCharge = toolRentalAgreement.formattedDailyCharge;
+	        int getChargeDays = toolRentalAgreement.chargeDays;
+	        String getChargeBeforeDiscount = toolRentalAgreement.formattedTotalBeforeDiscount;
+	        String getOutputDiscount = toolRentalAgreement.formattedDiscountPercent;
+	        String getDiscountAmount = toolRentalAgreement.formattedDiscountAmount;
+	        String getChargeAfterDiscount = toolRentalAgreement.formattedTotalAfterDiscount;
+
+	        assertEquals(getToolCode, toolCode[2]);
+	        assertEquals(getRentalDays, numberOfRentalDays[2]);
+	        assertEquals(getCheckoutDate, stringCheckoutDate[2]);
+	        assertEquals(getDueDate, stringDueDate[2]);
+	        assertEquals(getDailyCharge, outputDailyCharge[2]);
+	        assertEquals(getChargeDays, chargeDays[2]);
+	        assertEquals(getChargeBeforeDiscount, formattedTotalBeforeDiscount[2]);
+	        assertEquals(getOutputDiscount, outputPercentDiscount[2]);
+	        assertEquals(getDiscountAmount, formattedDiscountAmount[2]);
+	        assertEquals(getChargeAfterDiscount, formattedTotalAfterDiscount[2]); 
+	    }
+	    
+	    
+	    @Test
+	    public void Test4() {
+	        System.out.println("Test 4");
+	        String code = toolCode[3];
+	        Tool rentedTool = new Tool(code);
+	        
+	        int rentalDays = numberOfRentalDays[3];
+	        String checkoutDate = stringCheckoutDate[3];
+	        String dueDate = stringDueDate[3];
+	        int NumberOfChargeDays = chargeDays[3];
+	        double inputTotalBefore = inputTotalBeforeDiscount[3]; 
+	        double inputDiscount = inputDiscountAmount[3];
+	        int discount = percentDiscount[3];
+	        
+	        ToolRentalFeatures toolRentalFeatures = new ToolRentalFeatures();
+	        
+	        ToolRentalAgreement toolRentalAgreement = new ToolRentalAgreement
+	        			(rentedTool, checkoutDate, 
+						rentalDays, dueDate, NumberOfChargeDays,
+						toolRentalFeatures, inputTotalBefore, inputDiscount, discount);
+	        
+	        ToolRentalAgreement expResult = null;
+	        String getToolCode =  rentedTool.toolCode;
+	        int getRentalDays = toolRentalAgreement.rentalDays;
+	        String getCheckoutDate = toolRentalAgreement.checkoutDate;
+	        String getDueDate = toolRentalAgreement.dueDate;
+	        String getDailyCharge = toolRentalAgreement.formattedDailyCharge;
+	        int getChargeDays = toolRentalAgreement.chargeDays;
+	        String getChargeBeforeDiscount = toolRentalAgreement.formattedTotalBeforeDiscount;
+	        String getOutputDiscount = toolRentalAgreement.formattedDiscountPercent;
+	        String getDiscountAmount = toolRentalAgreement.formattedDiscountAmount;
+	        String getChargeAfterDiscount = toolRentalAgreement.formattedTotalAfterDiscount;
+
+	        assertEquals(getToolCode, toolCode[3]);
+	        assertEquals(getRentalDays, numberOfRentalDays[3]);
+	        assertEquals(getCheckoutDate, stringCheckoutDate[3]);
+	        assertEquals(getDueDate, stringDueDate[3]);
+	        assertEquals(getDailyCharge, outputDailyCharge[3]);
+	        assertEquals(getChargeDays, chargeDays[3]);
+	        assertEquals(getChargeBeforeDiscount, formattedTotalBeforeDiscount[3]);
+	        assertEquals(getOutputDiscount, outputPercentDiscount[3]);
+	        assertEquals(getDiscountAmount, formattedDiscountAmount[3]);
+	        assertEquals(getChargeAfterDiscount, formattedTotalAfterDiscount[3]); 
+	    }
+	    
+	    
+	    @Test
+	    public void Test5() {
+	        System.out.println("Test 2");
+	        String code = toolCode[4];
+	        Tool rentedTool = new Tool(code);
+	        
+	        int rentalDays = numberOfRentalDays[4];
+	        String checkoutDate = stringCheckoutDate[4];
+	        String dueDate = stringDueDate[4];
+	        int NumberOfChargeDays = chargeDays[4];
+	        double inputTotalBefore = inputTotalBeforeDiscount[4]; 
+	        double inputDiscount = inputDiscountAmount[4];
+	        int discount = percentDiscount[4];
+	        
+	        ToolRentalFeatures toolRentalFeatures = new ToolRentalFeatures();
+	        
+	        ToolRentalAgreement toolRentalAgreement = new ToolRentalAgreement
+	        			(rentedTool, checkoutDate, 
+						rentalDays, dueDate, NumberOfChargeDays,
+						toolRentalFeatures, inputTotalBefore, inputDiscount, discount);
+	        
+	        ToolRentalAgreement expResult = null;
+	        String getToolCode =  rentedTool.toolCode;
+	        int getRentalDays = toolRentalAgreement.rentalDays;
+	        String getCheckoutDate = toolRentalAgreement.checkoutDate;
+	        String getDueDate = toolRentalAgreement.dueDate;
+	        String getDailyCharge = toolRentalAgreement.formattedDailyCharge;
+	        int getChargeDays = toolRentalAgreement.chargeDays;
+	        String getChargeBeforeDiscount = toolRentalAgreement.formattedTotalBeforeDiscount;
+	        String getOutputDiscount = toolRentalAgreement.formattedDiscountPercent;
+	        String getDiscountAmount = toolRentalAgreement.formattedDiscountAmount;
+	        String getChargeAfterDiscount = toolRentalAgreement.formattedTotalAfterDiscount;
+
+	        assertEquals(getToolCode, toolCode[4]);
+	        assertEquals(getRentalDays, numberOfRentalDays[4]);
+	        assertEquals(getCheckoutDate, stringCheckoutDate[4]);
+	        assertEquals(getDueDate, stringDueDate[4]);
+	        assertEquals(getDailyCharge, outputDailyCharge[4]);
+	        assertEquals(getChargeDays, chargeDays[4]);
+	        assertEquals(getChargeBeforeDiscount, formattedTotalBeforeDiscount[4]);
+	        assertEquals(getOutputDiscount, outputPercentDiscount[4]);
+	        assertEquals(getDiscountAmount, formattedDiscountAmount[4]);
+	        assertEquals(getChargeAfterDiscount, formattedTotalAfterDiscount[4]); 
+	    }
+	    
+	    @Test
+	    public void Test6() {
+	        System.out.println("Test 6");
+	        String code = toolCode[5];
+	        Tool rentedTool = new Tool(code);
+	        
+	        int rentalDays = numberOfRentalDays[5];
+	        String checkoutDate = stringCheckoutDate[5];
+	        String dueDate = stringDueDate[5];
+	        int NumberOfChargeDays = chargeDays[5];
+	        double inputTotalBefore = inputTotalBeforeDiscount[5]; 
+	        double inputDiscount = inputDiscountAmount[5];
+	        int discount = percentDiscount[5];
+	        
+	        ToolRentalFeatures toolRentalFeatures = new ToolRentalFeatures();
+	        
+	        ToolRentalAgreement toolRentalAgreement = new ToolRentalAgreement
+	        			(rentedTool, checkoutDate, 
+						rentalDays, dueDate, NumberOfChargeDays,
+						toolRentalFeatures, inputTotalBefore, inputDiscount, discount);
+	        
+	        ToolRentalAgreement expResult = null;
+	        String getToolCode =  rentedTool.toolCode;
+	        int getRentalDays = toolRentalAgreement.rentalDays;
+	        String getCheckoutDate = toolRentalAgreement.checkoutDate;
+	        String getDueDate = toolRentalAgreement.dueDate;
+	        String getDailyCharge = toolRentalAgreement.formattedDailyCharge;
+	        int getChargeDays = toolRentalAgreement.chargeDays;
+	        String getChargeBeforeDiscount = toolRentalAgreement.formattedTotalBeforeDiscount;
+	        String getOutputDiscount = toolRentalAgreement.formattedDiscountPercent;
+	        String getDiscountAmount = toolRentalAgreement.formattedDiscountAmount;
+	        String getChargeAfterDiscount = toolRentalAgreement.formattedTotalAfterDiscount;
+
+	        assertEquals(getToolCode, toolCode[5]);
+	        assertEquals(getRentalDays, numberOfRentalDays[5]);
+	        assertEquals(getCheckoutDate, stringCheckoutDate[5]);
+	        assertEquals(getDueDate, stringDueDate[5]);
+	        assertEquals(getDailyCharge, outputDailyCharge[5]);
+	        assertEquals(getChargeDays, chargeDays[5]);
+	        assertEquals(getChargeBeforeDiscount, formattedTotalBeforeDiscount[5]);
+	        assertEquals(getOutputDiscount, outputPercentDiscount[5]);
+	        assertEquals(getDiscountAmount, formattedDiscountAmount[5]);
+	        assertEquals(getChargeAfterDiscount, formattedTotalAfterDiscount[5]); 
+	    }
+	
+}
