@@ -79,7 +79,7 @@ public class TestToolCheckout {
 	      
 	    @Test
 	    public void Test2() {
-	        System.out.println("Test 2");
+	        System.out.println("\nTest 2");
 	        String code = toolCode[1];
 	        Tool rentedTool = new Tool(code);
 	        
@@ -124,7 +124,7 @@ public class TestToolCheckout {
 	    
 	    @Test
 	    public void Test3() {
-	        System.out.println("Test 3");
+	        System.out.println("\nTest 3");
 	        String code = toolCode[2];
 	        Tool rentedTool = new Tool(code);
 	        
@@ -170,7 +170,7 @@ public class TestToolCheckout {
 	    
 	    @Test
 	    public void Test4() {
-	        System.out.println("Test 4");
+	        System.out.println("\nTest 4");
 	        String code = toolCode[3];
 	        Tool rentedTool = new Tool(code);
 	        
@@ -216,7 +216,7 @@ public class TestToolCheckout {
 	    
 	    @Test
 	    public void Test5() {
-	        System.out.println("Test 2");
+	        System.out.println("\nTest 5");
 	        String code = toolCode[4];
 	        Tool rentedTool = new Tool(code);
 	        
@@ -261,7 +261,7 @@ public class TestToolCheckout {
 	    
 	    @Test
 	    public void Test6() {
-	        System.out.println("Test 6");
+	        System.out.println("\nTest 6");
 	        String code = toolCode[5];
 	        Tool rentedTool = new Tool(code);
 	        
