@@ -1,0 +1,127 @@
+/*
+ * Main method for user input, and to display the Tool Rental Agreement
+ * 
+ * @author Ashley Ridout
+ * @version 1.0.0.0
+ * @since 2018-12-16
+ */
+package nailedItToolRental;
+
+import java.text.*;
+import java.time.*;
+import java.util.*;
+
+public class ToolCheckout {
+
+	public static void main(String[] args) {
+
+		Tool rentedTool = new Tool();
+		ToolRentalFeatures toolRentalFeatures = new ToolRentalFeatures();
+		Date formattedCheckoutDate = null;
+		String stringCheckoutDate;
+		Date dueDate;
+		String stringDueDate;
+		int numberOfRentalDays = 0;
+		int chargeDays = 0;
+		int discountOnTool = 0;
+		double totalChargeBeforeDiscount;
+		double discountAmount;
+
+		Scanner reader = new Scanner(System.in);
+
+		// get tool code from the user
+		System.out.println("Please enter the toolcode for the tool you'd like to rent.");
+		while (true) {
+			try {
+				String toolCode = reader.next();
+				rentedTool = new Tool(toolCode);
+				break;
+			} catch (IllegalArgumentException e) {
+				System.out.println("Please re-enter an existing tool code.");
+				e.printStackTrace();
+				continue;
+			}
+		}
+
+		// get checkout date from the user
+		System.out.println("Please enter the date for checkout tool in the format" 
+				+ " MM/DD/YY. For example: 01/01/18.");
+		while (true) {
+			try {
+				stringCheckoutDate = reader.next();
+				formattedCheckoutDate = toolRentalFeatures.formatCheckoutDate(stringCheckoutDate);
+				break;
+			} catch (ParseException e) {
+				System.out.println("Please re-enter date in proper format.");
+				e.printStackTrace();
+				continue;
+			}
+		}
+
+		// get number of rental days from the user
+		System.out.println("Please select number of days to rent tool.");
+		while (true) {
+			try {
+				numberOfRentalDays = reader.nextInt();
+				// set due date for the tool
+				dueDate = toolRentalFeatures.setDueDate(formattedCheckoutDate, numberOfRentalDays);
+				stringDueDate = toolRentalFeatures.convertDateToString(dueDate);
+				break;
+			} catch (IllegalArgumentException e) {
+				System.out.println("Please re-enter a number of rental days greater than 1.");
+				e.printStackTrace();
+				continue;
+			}
+		}
+		
+		// set rental dates for the tool
+		List<LocalDate> listOfRentalDays = toolRentalFeatures
+				.getDatesDuringRental(formattedCheckoutDate, numberOfRentalDays);
+
+		// check if any dates are on a weekend");
+		toolRentalFeatures.weekendDuringRental(listOfRentalDays);
+
+		// check if any of the dates fall on Labor Day.");
+		ToolRentalFeatures.isLaborDay(listOfRentalDays);
+
+		// check if any of the dates fall on the observed date for 4th of July
+		ToolRentalFeatures.isObservedJuly4th(listOfRentalDays);
+
+		// get number of charge days
+		chargeDays = toolRentalFeatures.getChargeDays(rentedTool, listOfRentalDays, 
+				numberOfRentalDays);
+
+		// get total charge before discount
+		totalChargeBeforeDiscount = toolRentalFeatures
+				.totalChargeBeforeDiscount(rentedTool, chargeDays);
+
+		// get percent discount from the user
+		System.out.println("Please provide the percent discount on the rented tool, "
+				+ "if applicable. For example: '20' for 20%.");	
+		while (true) {
+			try {
+				discountOnTool = reader.nextInt();
+				discountAmount = toolRentalFeatures.getDiscountAmount(totalChargeBeforeDiscount, 
+						discountOnTool);
+				break;
+			} catch (IllegalArgumentException e) {
+				System.out.println("Please re-enter a percent discount between 0 and 100.");
+				e.printStackTrace();
+				continue;
+			}
+		}
+		
+		// get the total amount charged to customer after discount
+				toolRentalFeatures.totalChargeAfterDiscount(totalChargeBeforeDiscount, 
+							discountAmount);
+
+		// instance of ToolRentalAgreement
+		ToolRentalAgreement toolRentalAgreement = new ToolRentalAgreement
+				(rentedTool, stringCheckoutDate,
+				numberOfRentalDays, stringDueDate, chargeDays,
+				toolRentalFeatures, totalChargeBeforeDiscount, discountAmount,
+				discountOnTool);	
+		// close resources
+		reader.close();
+	}
+}
