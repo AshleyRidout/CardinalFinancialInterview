@@ -1,0 +1,117 @@
+/*
+ * Constructor and methods for Tool object
+ * 
+ * @author Ashley Ridout
+ * @version 1.0.0.0
+ * @since 2018-12-15
+ */
+
+package nailedItToolRental;
+
+public class Tool {
+    
+    protected String toolBrand;
+    protected String toolCode;
+    protected String formattedToolCode;
+    protected String toolType;
+    double dailyCharge = 0;
+    
+    // empty constructor  
+    protected Tool() {}
+    
+    // constructor
+    protected Tool (String toolCode) {
+        this.toolCode = toolCode;
+        formattedToolCode = toolCode.toUpperCase();
+        getToolBrandAndType();
+    }       
+    
+    /*
+     * toolCode determines the tool brand and type
+     * 
+     * @return toolBrand	the String tool brand matching the toolCode
+     * @return toolType		the String tool type matching the toolCode
+     */
+    private void getToolBrandAndType() throws IllegalArgumentException {        
+        switch (formattedToolCode) {
+        	case "CHNS":
+        		toolBrand = "Stihl";
+        		toolType = "Chainsaw";
+                break;
+            case "JAKD":
+                toolBrand = "DeWalt";
+                toolType = "Jackhammer";
+                break;
+            case "JAKR":
+                toolBrand = "Ridgid";
+                toolType = "Jackhammer";
+                break;
+            case "LADW":
+                toolBrand = "Werner";
+                toolType = "Ladder";
+                break;
+            default: 
+            	throw new IllegalArgumentException("Invalid tool code: "
+            			+ formattedToolCode);
+        }
+    }
+    
+    protected String getFormattedToolCode() {
+    	return formattedToolCode;
+    }
+    
+    /*
+     * Each toolType has a specific daily charge
+     * 
+     * @return dailyCharge	the double daily price for the specific tool rented
+     */
+    protected double getDailyCharge() {    
+        switch (toolType) {
+        	case "Chainsaw":
+        		dailyCharge = 1.49;   
+        		break;
+            case "Ladder":
+                dailyCharge = 1.99;
+                break;
+            case "Jackhammer":
+                dailyCharge = 2.99;
+                break;
+            default:
+            	dailyCharge = 0.00;
+            	System.out.println("Invalid tool type.");
+                break;
+        }
+        return dailyCharge;
+    } 
+    
+    /*
+     * If it is a holiday, certain tools have no charge
+     * 
+     * @return freeOnHoliday	boolean true if the tool is free on holidays
+     */
+    protected boolean isRentedOnHoliday (){
+        boolean freeOnHolidays = false;
+        
+        if (toolType.equals("Ladder") || toolType.equals("Jackhammer")){
+            freeOnHolidays = true;
+        }
+
+        return freeOnHolidays;
+    } 
+    
+    
+     /*
+      * If it is a weekend, certain tools have no charge
+      * 
+      * @return freeOnWeekends	boolean true if the tool is free on weekends
+      */
+    protected boolean isRentedOnWeekend (){
+        boolean freeOnWeekends = false;
+        
+        if (toolType.equals("Chainsaw") || toolType.equals("Jackhammer")){
+            freeOnWeekends = true;
+        }
+
+        return freeOnWeekends;
+    }     
+}
