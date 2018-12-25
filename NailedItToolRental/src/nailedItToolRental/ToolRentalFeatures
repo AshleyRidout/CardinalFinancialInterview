@@ -6,7 +6,7 @@
  * 					 Exceptions for illegal arguments based on business logic
  * 
  * @author Ashley Ridout
- * @version 1.0.0.0
+ * @version 1.0.1.0
  * @since 2018-12-16
  */
 package nailedItToolRental;
