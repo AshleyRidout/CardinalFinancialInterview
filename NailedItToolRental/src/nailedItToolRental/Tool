@@ -8,6 +8,9 @@
 
 package nailedItToolRental;
 
+import java.text.NumberFormat;
+import java.util.Locale;
+
 public class Tool {
     
     protected String toolBrand;
@@ -15,6 +18,7 @@ public class Tool {
     protected String formattedToolCode;
     protected String toolType;
     double dailyCharge = 0;
+    String formattedDailyCharge;
     
     // empty constructor  
     protected Tool() {}
@@ -56,12 +60,18 @@ public class Tool {
         }
     }
     
+    /*
+     * Return tool code in upperCase
+     * 
+     * @return formatted ToolCode the String of uppercase toolCode
+     */
     protected String getFormattedToolCode() {
     	return formattedToolCode;
     }
     
     /*
      * Each toolType has a specific daily charge
+     * Set the String formattedDailyCharge member variable
      * 
      * @return dailyCharge	the double daily price for the specific tool rented
      */
@@ -69,12 +79,18 @@ public class Tool {
         switch (toolType) {
         	case "Chainsaw":
         		dailyCharge = 1.49;   
+        		formattedDailyCharge = NumberFormat.getCurrencyInstance(new Locale("en", "US"))
+ 				       .format(dailyCharge);
         		break;
             case "Ladder":
                 dailyCharge = 1.99;
+                formattedDailyCharge = NumberFormat.getCurrencyInstance(new Locale("en", "US"))
+ 				       .format(dailyCharge);
                 break;
             case "Jackhammer":
                 dailyCharge = 2.99;
+                formattedDailyCharge = NumberFormat.getCurrencyInstance(new Locale("en", "US"))
+ 				       .format(dailyCharge);
                 break;
             default:
             	dailyCharge = 0.00;
@@ -115,4 +131,3 @@ public class Tool {
         return freeOnWeekends;
     }     
 }
-
