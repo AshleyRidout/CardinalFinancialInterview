@@ -8,9 +8,6 @@
 package nailedItToolRental;
 
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
-import java.util.Date;
-import java.util.Locale;
 
 public class ToolRentalAgreement {
 	protected Tool rentedTool;
@@ -24,65 +21,39 @@ public class ToolRentalAgreement {
 	protected String formattedDiscountPercent;
 	protected String formattedDiscountAmount;
 	protected String formattedTotalAfterDiscount;
-	
+
 	/*
 	 * Constructor to generate rental agreement to display to customer on console
 	 * 
-	 * @param rentedTool				the Tool being rented
-	 * @param checkoutDate				the Date formatted from the String user input
-	 * @param rentalDays				the int count of days the tool is being rented
-	 * @param dueDate					the Date when the user is required to return the tool
-	 * @param toolRentalFeatures		the ToolRentalFeatures with attributes of the Tool object
-	 * @param decimalPercentDiscount	the double discount percentage as a decimal
+	 * @param rentedTool the Tool being rented
+	 * 
+	 * @param toolRentalFeatures the ToolRentalFeatures with attributes of the Tool
+	 * object
 	 */
-	protected ToolRentalAgreement(Tool rentedTool, String checkoutDate, int rentalDays, 
-			String dueDate, int chargeDays, ToolRentalFeatures toolRentalFeatures, 
-			double totalBeforeDiscount, double inputDiscount, int percentDiscount) {
-		
-		this.checkoutDate = checkoutDate;
-		this.dueDate = dueDate;
-		this.chargeDays = chargeDays;
-		this.rentalDays = rentalDays;
-		
-		// format Strings that will be displayed on the console 
-		double dailyCharge = rentedTool.getDailyCharge();
-		
-		formattedDailyCharge = NumberFormat.getCurrencyInstance(new Locale("en", "US"))
-		       .format(dailyCharge);
-		
-		double beforeDiscount = toolRentalFeatures.totalChargeBeforeDiscount(rentedTool, chargeDays);
-		formattedTotalBeforeDiscount = NumberFormat
-				.getCurrencyInstance(new Locale("en", "US"))
-				.format(beforeDiscount);
-		
+
+	protected ToolRentalAgreement(Tool rentedTool, ToolRentalFeatures toolRentalFeatures) {
+		// format Strings that will be displayed on the console
+
+		int percentDiscount = toolRentalFeatures.getPercentDiscount();
+
+		// double beforeDiscount =
+		// toolRentalFeatures.totalChargeBeforeDiscount(rentedTool, chargeDays);
+
 		double decimalPercentDiscount = percentDiscount * .01;
 		formattedDiscountPercent = new DecimalFormat("##%").format(decimalPercentDiscount);
-		
-		double discountAmount = toolRentalFeatures.getDiscountAmount(totalBeforeDiscount, percentDiscount);
-		// round up to nearest cent
-		double roundTo = .01;
-		discountAmount = roundTo * Math.round(discountAmount / roundTo);
-		formattedDiscountAmount = NumberFormat
-				.getCurrencyInstance(new Locale("en", "US"))
-				.format(discountAmount);
-		
-		double totalAfterDiscount = toolRentalFeatures.totalChargeAfterDiscount(totalBeforeDiscount, discountAmount);
-		formattedTotalAfterDiscount = NumberFormat
-				.getCurrencyInstance(new Locale("en", "US"))
-				.format(totalAfterDiscount);
-		
+
 		// print each line item to console
 		System.out.println("\nTool code:\t\t" + rentedTool.formattedToolCode);
 		System.out.println("Tool type:\t\t" + rentedTool.toolType);
 		System.out.println("Tool brand:\t\t" + rentedTool.toolBrand);
-		System.out.println("Rental days:\t\t" + rentalDays);
-		System.out.println("Check out date:\t\t" + checkoutDate);
-		System.out.println("Due date:\t\t" + dueDate);
-		System.out.println("Daily rental charge:\t" + formattedDailyCharge);
-		System.out.println("Charge days:\t\t" + chargeDays);
-		System.out.println("Pre-discount charge:\t" + formattedTotalBeforeDiscount);
+		System.out.println("Rental days:\t\t" + toolRentalFeatures.numberOfRentalDays);
+		System.out.println("Check out date:\t\t" + toolRentalFeatures.userCheckoutDate);
+		System.out.println("Due date:\t\t" + toolRentalFeatures.stringDueDate);
+		System.out.println("Daily rental charge:\t" + rentedTool.formattedDailyCharge);
+		System.out.println("Charge days:\t\t" + toolRentalFeatures.chargeDays);
+		System.out.println("Pre-discount charge:\t" + toolRentalFeatures.formattedTotalBeforeDiscount);
 		System.out.println("Discount percent:\t" + formattedDiscountPercent);
-		System.out.println("Discount amount:\t" + formattedDiscountAmount);
-		System.out.println("Final charge:\t\t" + formattedTotalAfterDiscount);
+		System.out.println("Discount amount:\t" + toolRentalFeatures.formattedDiscountAmount);
+		System.out.println("Final charge:\t\t" + toolRentalFeatures.formattedTotalAfterDiscount);
 	}
 }
