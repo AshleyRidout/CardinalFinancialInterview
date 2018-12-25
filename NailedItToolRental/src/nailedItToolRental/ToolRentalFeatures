@@ -11,6 +11,7 @@
  */
 package nailedItToolRental;
 
+import java.text.NumberFormat;
 import java.text.ParseException;
 
 import java.text.SimpleDateFormat;
@@ -21,19 +22,40 @@ import java.time.ZoneId;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class ToolRentalFeatures {
+
+	protected String toolCode;
+	protected String userCheckoutDate;
+	protected String stringDueDate;
+	protected int numberOfRentalDays;
+	protected int discountPercent;
 	protected int chargeDays;
 	protected double totalBeforeDiscount;
+	protected String formattedTotalBeforeDiscount;
 	protected double dailyCharge;
 	protected double decimalPercentDiscount;
 	protected double discountAmount;
+	protected double roundedDiscountAmount;
+	protected String formattedDiscountAmount;
 	protected double totalAfterDiscount;
+	protected String formattedTotalAfterDiscount;
 	
 	// empty constructor
 	protected ToolRentalFeatures(){}
+	
+	//constructor with parameters inputted by user
+	protected ToolRentalFeatures(String toolCode, String userCheckoutDate, 
+			int numberOfRentalDays, int discountPercent) {
+		Tool rentedTool = new Tool(toolCode);
+		this.toolCode = toolCode;
+		this.userCheckoutDate = userCheckoutDate;
+		this.numberOfRentalDays = numberOfRentalDays;
+		this.discountPercent = discountPercent;
+	}
 	
 	/******************* Methods to define rental dates and charge dates *******************/
 	
@@ -44,12 +66,12 @@ public class ToolRentalFeatures {
 	 * @return checkoutDate		the Date formatted from the String user input
 	 * @throws ParseException	if the date format is not MM/dd/yy
 	 */
-	protected Date formatCheckoutDate(String userCheckoutDate) 
+	protected Date formatSimpleDate(String userDate) 
 			throws ParseException {
-			SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy");
-			Date checkoutDate = dateFormat.parse(userCheckoutDate);
+			SimpleDateFormat dateFormat = new SimpleDateFormat("M/d/yy");
+			Date simpleDate = dateFormat.parse(userDate);
 
-			return checkoutDate;
+			return simpleDate;
 	}
 
 	/*
@@ -59,19 +81,27 @@ public class ToolRentalFeatures {
 	 * @param rentalDays	the int for the number of days the tool is rented
 	 * @return dueDate		the Date when the user is required to return the tool
 	 */
-	protected Date setDueDate(Date checkoutDate, int rentalDays) {
-		//validate user input for number of rental days
-		validateNumberOfRentalDays(rentalDays);
-		
+	protected Date setDueDate(Date checkoutDate, int rentalDays) {	
 		//get due date based on checkout date and number of rental days
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(checkoutDate);
 		cal.add(Calendar.DATE, rentalDays);
 		Date dueDate = cal.getTime();
-
+		
 		return dueDate;
 	}
-
+	
+	/*
+	 * Convert the due date to a String format
+	 * 
+	 * @param dateDueDate		the Date value of the due date
+	 * @return stringDueDate	the String value of the due date
+	 */
+	protected String getDueDate(Date dateDueDate) {
+		stringDueDate = convertDateToString(dateDueDate);
+		
+		return stringDueDate;
+	}
 
 	/*
 	 * Get all the dates from checkout date through due date
@@ -111,11 +141,11 @@ public class ToolRentalFeatures {
 	 * @return stringDate	the String that was converted
 	 */
 	protected String convertDateToString(Date dateToConvert) {
-	String stringDate;
-	SimpleDateFormat dateFormat = new SimpleDateFormat("MM/dd/yy");
-	stringDate = dateFormat.format(dateToConvert);
+		String stringDate;
+		SimpleDateFormat dateFormat = new SimpleDateFormat("M/d/yy");
+		stringDate = dateFormat.format(dateToConvert);
 	
-	return stringDate;
+		return stringDate;
 	}
 	
 	/*
@@ -189,11 +219,9 @@ public class ToolRentalFeatures {
 				switch (day) {
 				case SATURDAY:
 					date = date.minusDays(1);
-					System.out.print(date);
 					return isObservedJuly4 = true;
 				case SUNDAY:
 					date = date.plusDays(1);
-					System.out.print(date);
 					return isObservedJuly4 = true;
 				default:
 					return isObservedJuly4 = true;
@@ -240,6 +268,10 @@ public class ToolRentalFeatures {
 
 	/******************* Methods to change total charge based on discount ******************/
 	
+	
+	protected int getPercentDiscount() {
+		return discountPercent;
+	}
 	/*
 	 * Get the total amount the customer owes before any applicable discount
 	 * 
@@ -257,6 +289,20 @@ public class ToolRentalFeatures {
 	}
 	
 	/*
+	 * Format the total charge before discount to U.S. currency format
+	 * 
+	 * @param totalBeforeDiscount			the double total before discount
+	 * @return formattedTotalBeforeDiscount	the String total before discount in U.S. 
+	 * 										currency format 						
+	 */
+	protected String getFormattedTotalChargeBeforeDiscount(double totalBeforeDiscount) {
+		formattedTotalBeforeDiscount = NumberFormat
+				.getCurrencyInstance(new Locale("en", "US"))
+				.format(totalBeforeDiscount);
+		
+		return formattedTotalBeforeDiscount;
+	}
+	/*
 	 * Get the discount amount that will be deducted from the subtotal
 	 * 
 	 * @param totalBeforeDiscount	the double total owed by the customer before discount
@@ -265,13 +311,32 @@ public class ToolRentalFeatures {
 	 */
 	protected double getDiscountAmount(double totalBeforeDiscount, int percentDiscount) {
 		// validate user input for discount percent entered
-		validateDiscountPercent(percentDiscount);
+		// validateDiscountPercent(percentDiscount);
 		
-		//change whole number to decimal percentage
+		// change whole number to decimal percentage
 		decimalPercentDiscount = percentDiscount * 0.01;
 		discountAmount = (totalBeforeDiscount * decimalPercentDiscount);
 		
 		return discountAmount;
+	}
+	
+	/*
+	 * Format the discount amount by rounding up to the nearest penny
+	 * and in U.S. currency format
+	 * 
+	 * @param discountAmount			the double discount amount
+	 * @return formattedDiscountAmount	the String discount amount rounded to the nearest
+	 * 		 							penny in U.S. currency format										 						
+	 */
+	protected String getFormattedDiscountAmount(double discountAmount) {
+		// round up to nearest cent
+		double roundTo = .01;
+		roundedDiscountAmount = roundTo * Math.round(discountAmount / roundTo);
+		formattedDiscountAmount = NumberFormat
+			.getCurrencyInstance(new Locale("en", "US"))
+			.format(roundedDiscountAmount);
+	
+		return formattedDiscountAmount;
 	}
 	
 	/*
@@ -284,9 +349,24 @@ public class ToolRentalFeatures {
 	protected double totalChargeAfterDiscount(double totalBeforeDiscount, 
 			double discountAmount) {
 		
-		totalAfterDiscount = totalBeforeDiscount - discountAmount;
+		totalAfterDiscount = totalBeforeDiscount - roundedDiscountAmount;
 		
 		return totalAfterDiscount;
+	}
+	
+	/*
+	 * Format the total charge after discount to U.S. currency format
+	 * 
+	 * @param totalAfterDiscount			the double total after discount
+	 * @return formattedTotalAfterDiscount	the String total after discount in U.S. 
+	 * 										currency format 
+	 */
+	protected String getFormattedTotalChargeAfterDiscount(double totalAfterDiscount) {
+		formattedTotalAfterDiscount = NumberFormat
+				.getCurrencyInstance(new Locale("en", "US"))
+				.format(totalAfterDiscount);
+		
+		return formattedTotalAfterDiscount;
 	}
 
 	/*************** Exceptions for illegal arguments based on business logic **************/
